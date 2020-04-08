@@ -136,9 +136,10 @@ const Save = (req, res) => {
                 console.log(User);
                 console.log('Hello world ghost');
                 console.log(User + ' again');
-                //res = (User);
+                var ID = Number(User.toString());
+                console.log(ID);
                 // res.render('index', { title: User});
-                res.send(User > 0 ? 'Successfull' : 'Failed')
+                res.send(ID > 0 ? 'Successfull' : 'Failed')
             }
         })
     }
