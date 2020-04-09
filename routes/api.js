@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-const UserDAO = require('../bin/data-access/UserDAO');
+const UserDAO = require('../bin/data-access/UserDAO.PG');
 /* GET home page. */
   router.post('/', function(req, res, next) {
   debugger; 

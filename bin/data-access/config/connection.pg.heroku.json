@@ -1,0 +1,7 @@
+{
+    "host": "ec2-52-71-231-180.compute-1.amazonaws.com",
+    "port": 5432,
+    "database": "det70dkeplfoq6",
+    "user": "hjebkrrnqcbpdh",
+    "password": "4492b6345207e983b2fe9556a111d10c8702aeb8e6fdba938a4a9c1511a7e555"
+  }
