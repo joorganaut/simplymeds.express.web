@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "build": "webpack"
+    "build": "node"
   },
   "engines": {
     "node": ">= 0.10.0",
