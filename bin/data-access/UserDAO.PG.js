@@ -124,13 +124,14 @@ const GetUserByEmail = (req, res) => {
 };
 const Save = (req, res) => {
     try {
-        var params = {
-            FirstName : 'Joorgi',
-            LastName : 'Spectra',
-            FullName : 'Joorgi Spectra',
-            Password : saltedMd5('password10$', 'Joorgi'),
-        }
-        console.log('i go the hell here ' + saltedMd5('password10$', 'Joorgi'))
+
+        var params = req.body;//{
+        //     FirstName : 'Joorgi',
+        //     LastName : 'Spectra',
+        //     FullName : 'Joorgi Spectra',
+        params.Password = saltedMd5(params.Password, 'Joorgi'),
+        // }
+        console.log('i go the hell here ' + params.Password)
         Users.create(params).then(rows => {
             if (rows !== null) {
                 console.log(`${JSON.stringify(rows.ID)} Successful`);
@@ -141,7 +142,7 @@ const Save = (req, res) => {
                 var ID = Number(User.toString());
                 console.log(ID);
                 // res.render('index', { title: User});
-                res.send(ID > 0 ? 'Successfull' : 'Failed')
+                res.send(ID > 0 ? `Successfull-{ID : ${ID}}` : 'Failed')
             }
         })
     }
