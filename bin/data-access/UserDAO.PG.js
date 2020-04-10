@@ -1,36 +1,14 @@
 const connection = require('./config/connection.pg.heroku.json');
-var Sequelize = require('sequelize');
-var pg = require('pg')
+const { Op, DataTypes } = require('sequelize');
+const BusinessObject = require('./businessObject')
 const saltedMd5 = require('salted-md5');
-const { Op, DataTypes } = Sequelize;
 
 const DISABLE_SEQUELIZE_DEFAULTS = {
     timestamps: false,
     freezeTableName: true,
     ssl : false,
 };
-console.log(connection.host + ' ' + connection.port + ' ' + connection.user)
-const sequelize = new Sequelize({
-    database: connection.database,
-    username: connection.user,
-    host: connection.host,
-    port: connection.port,
-    password: connection.password,
-    dialect: 'postgres',
-    protocol: 'postgres',
-    dialectOptions: {
-        ssl: {
-            rejectUnauthorized : false
-        }
-    },
-    pool: {
-        max: 5,
-        min: 0,
-        idle: 300000,
-        acquire: 300000
-    },
-    logging: log => console.log('logging:', log)
-});
+const sequelize  = BusinessObject.sequelize;
 const Users = sequelize.define('users', {
     ID: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     Username: { type:  DataTypes.STRING},
@@ -55,7 +33,6 @@ const Users = sequelize.define('users', {
     InstitutionID: { type:  DataTypes.INTEGER},
     Name: { type:  DataTypes.STRING},
 }, DISABLE_SEQUELIZE_DEFAULTS);
-//let User = {};
 const GetUser = (req, res) => {
     this.ID = req.body.ID;
     try {
