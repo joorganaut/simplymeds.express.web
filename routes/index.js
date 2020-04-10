@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const UserDAO = require('../bin/data-access/UserDAO.PG');
+const UserDAO = require('../bin/data-access/UserDAO');
 /* GET home page. */
 // router.get('/', function(req, res, next) {
   router.get('/', function(req, res, next) {
