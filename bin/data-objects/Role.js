@@ -9,20 +9,8 @@ const DISABLE_SEQUELIZE_DEFAULTS = {
     ssl : false,
 };
 const sequelize  = BusinessObject.sequelize;
-const Users = sequelize.define('users', {
+const Role = sequelize.define('roles', {
     ID: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
-    Username: { type:  DataTypes.STRING},
-    FirstName: { type:  DataTypes.STRING},
-    LastName: { type:  DataTypes.STRING},
-    FullName: { type:  DataTypes.STRING},
-    Password: { type:  DataTypes.STRING},
-    TransactionPin: { type:  DataTypes.STRING},
-    IsEmailVerified: {type: DataTypes.BOOLEAN},
-    ForcePasswordChange: { type:  DataTypes.BOOLEAN},
-    LastLoginDate: { type:  DataTypes.DATE},
-    NumberOfFailedAttempts: { type:  DataTypes.INTEGER},
-    Email: { type:  DataTypes.STRING},
-    ActivationLink: { type:  DataTypes.STRING},
     IsEnabled: { type:  DataTypes.BOOLEAN},
     DateCreated: { type:  DataTypes.DATE},
     DateLastModified: { type:  DataTypes.DATE},
@@ -32,6 +20,7 @@ const Users = sequelize.define('users', {
     InstitutionCode: { type:  DataTypes.STRING},
     InstitutionID: { type:  DataTypes.INTEGER},
     Name: { type:  DataTypes.STRING},
-}, 
-{tableName : 'users'},DISABLE_SEQUELIZE_DEFAULTS);
-module.exports = {Users}
+},
+{tableName : 'roles'},
+ DISABLE_SEQUELIZE_DEFAULTS);
+module.exports = {Role}

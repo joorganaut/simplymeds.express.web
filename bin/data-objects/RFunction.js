@@ -8,21 +8,15 @@ const DISABLE_SEQUELIZE_DEFAULTS = {
     freezeTableName: true,
     ssl : false,
 };
+/*public virtual long RoleID { get; set; }
+        public virtual long FunctionID { get; set; }*/
 const sequelize  = BusinessObject.sequelize;
-const Users = sequelize.define('users', {
+const RFunction = sequelize.define('rfunctions', {
     ID: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
-    Username: { type:  DataTypes.STRING},
-    FirstName: { type:  DataTypes.STRING},
-    LastName: { type:  DataTypes.STRING},
-    FullName: { type:  DataTypes.STRING},
-    Password: { type:  DataTypes.STRING},
-    TransactionPin: { type:  DataTypes.STRING},
-    IsEmailVerified: {type: DataTypes.BOOLEAN},
-    ForcePasswordChange: { type:  DataTypes.BOOLEAN},
-    LastLoginDate: { type:  DataTypes.DATE},
-    NumberOfFailedAttempts: { type:  DataTypes.INTEGER},
-    Email: { type:  DataTypes.STRING},
-    ActivationLink: { type:  DataTypes.STRING},
+    RoleName:{ type:  DataTypes.STRING},
+    RoleID: { type:  DataTypes.BIGINT},
+    FunctionName:{ type:  DataTypes.STRING},
+    FunctionID: { type:  DataTypes.BIGINT},
     IsEnabled: { type:  DataTypes.BOOLEAN},
     DateCreated: { type:  DataTypes.DATE},
     DateLastModified: { type:  DataTypes.DATE},
@@ -32,6 +26,7 @@ const Users = sequelize.define('users', {
     InstitutionCode: { type:  DataTypes.STRING},
     InstitutionID: { type:  DataTypes.INTEGER},
     Name: { type:  DataTypes.STRING},
-}, 
-{tableName : 'users'},DISABLE_SEQUELIZE_DEFAULTS);
-module.exports = {Users}
+},
+{tableName : 'rfunctions'},
+ DISABLE_SEQUELIZE_DEFAULTS);
+module.exports = {RFunction}
