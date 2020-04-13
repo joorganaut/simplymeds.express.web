@@ -6,11 +6,12 @@ const Role = require('../data-objects/Role').Role;
 const UFunction = require('../data-objects/UFunction').UFunction
 const UFunctionList = require('../data-access/config/UFunctions')
 const sequelize  = BusinessObject.sequelize;
-let Production = process.env['PRODUCTION']
-let ForceUpdate = process.env['FORCE_UPDATE']
+let Production = Boolean(process.env['PRODUCTION'])
+let ForceUpdate = Boolean(process.env['FORCE_UPDATE'])
 const SchemaUpdate =()=>{ 
-    try{
-        console.log('ForceUpdate: ' + ForceUpdate + ', Production: '+Production)
+    try{        
+        console.log('ForceUpdate: ' + ForceUpdate + ', Production: '+ Production )
+        // sequelize.sync({force: true})
         Production ? sequelize.sync({alter: true}) : ForceUpdate? sequelize.sync({force: true}) :  sequelize.sync({alter: true})
     }
     catch(error)
