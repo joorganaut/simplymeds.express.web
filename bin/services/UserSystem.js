@@ -5,6 +5,7 @@ const T = require('../data-access/BusinessObjectDAO')
 let Users = require('../data-objects/Users').Users;
 let Roles = require('../data-objects/Role').Role;
 let UserRoles = require('../data-objects/UserRole').UserRole
+let Patients = require('../data-objects/Patient').Patient
 class UserSystem {
     constructor(req, res) {
         this.req = req;
@@ -80,27 +81,36 @@ class UserSystem {
             } else {
                 var params = this.req.body;
                 params.Password = saltedMd5(params.Password, 'Joorgi')
-                await T.Save(Users, params).then(data =>{
-                    T.GetAllBy(Roles, {Name : 'Customer'}).then(customerRoles =>{
-                        if(customerRoles.length > 0)
-                        {
-                            customerRoles.forEach(async x=>{
-                                var userRole = {
-                                    UserID : data.ID,
-                                    RoleID : x.ID,
-                                    Username : data.Email,
-                                    RoleName : x.Name
-                                }
-                                await T.Save(UserRoles, userRole)
-                            })
-                        }
-                        response = {
-                            record: data.ID,
-                            Message: Responses.MessageResponse_SUCCESS.Message,
-                            Code: Responses.MessageResponse_SUCCESS.Code
-                        }
-                        this.res.send(JSON.stringify(response));                                                
+                await T.Save(Users, params).then(async data =>{
+                    var patient = {
+                        FirstName : data.FirstName,
+                        LastName : data.LastName,
+                        UserID : data.ID,
+                        PhoneNumber : this.req.body.MobilePhoneNumber
+                    }
+                    await T.Save(Patients, patient).then(async ()=>{
+                        await T.GetAllBy(Roles, {Name : 'Customer'}).then(customerRoles =>{
+                            if(customerRoles.length > 0)
+                            {
+                                customerRoles.forEach(async x=>{
+                                    var userRole = {
+                                        UserID : data.ID,
+                                        RoleID : x.ID,
+                                        Username : data.Email,
+                                        RoleName : x.Name
+                                    }
+                                    await T.Save(UserRoles, userRole)
+                                })
+                            }
+                            response = {
+                                record: data.ID,
+                                Message: Responses.MessageResponse_SUCCESS.Message,
+                                Code: Responses.MessageResponse_SUCCESS.Code
+                            }
+                            this.res.send(JSON.stringify(response));                                                
+                        })
                     })
+                     //right here
                     
                 });                
             }

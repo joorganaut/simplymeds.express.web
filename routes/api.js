@@ -3,6 +3,7 @@ var router = express.Router();
 
 const UserSystem = require('../bin/services/UserSystem').UserSystem;
 const MenuSystem = require('../bin/services/MenuSystem').MenuSystem;
+const PatientSystem = require('../bin/services/PatientSystem').PatientSystem;
 const SchemaUpdate = require('../bin/services/SchemaUpdate')
 SchemaUpdate.SchemaUpdate();
 SchemaUpdate.PopulateRoles().then(()=>{});
@@ -33,6 +34,10 @@ router.post('/Login', function (req, res, next) {
 router.post('/RetrieveMenu', function (req, res, next) {
   let service = new MenuSystem(req, res);
   service.RetrieveMenu();
+})
+router.post('/RetrievePatientDetails', function (req, res, next) {
+  let service = new PatientSystem(req, res);
+  service.RetrievePatientByUserID();
 })
 
 module.exports = router;
