@@ -4,6 +4,7 @@ var router = express.Router();
 const UserSystem = require('../bin/services/UserSystem').UserSystem;
 const MenuSystem = require('../bin/services/MenuSystem').MenuSystem;
 const PatientSystem = require('../bin/services/PatientSystem').PatientSystem;
+const PatientMedicalsSystem = require('../bin/services/PatientMedicalsSystem').PatientMedicalsSystem;
 const SchemaUpdate = require('../bin/services/SchemaUpdate')
 SchemaUpdate.SchemaUpdate();
 SchemaUpdate.PopulateRoles().then(()=>{});
@@ -38,6 +39,14 @@ router.post('/RetrieveMenu', function (req, res, next) {
 router.post('/RetrievePatientDetails', function (req, res, next) {
   let service = new PatientSystem(req, res);
   service.RetrievePatientByUserID();
+})
+router.post('/RetrievePatientMedicals', function (req, res, next) {
+  let service = new PatientMedicalsSystem(req, res);
+  service.RetrievePatientMedicalsByPatientID();
+})
+router.post('/AddPatientMedicals', function (req, res, next) {
+  let service = new PatientMedicalsSystem(req, res);
+  service.AddMedicalInfo();
 })
 
 module.exports = router;
