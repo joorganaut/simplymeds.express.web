@@ -48,5 +48,9 @@ router.post('/AddPatientMedicals', function (req, res, next) {
   let service = new PatientMedicalsSystem(req, res);
   service.AddMedicalInfo();
 })
+router.post('/UpdatePatientDetails', function (req, res, next) {
+  let service = new PatientSystem(req, res);
+  service.UpdatePatientDetails();
+})
 
 module.exports = router;

@@ -89,11 +89,7 @@ Update = async (params) => {
     try {
         var result = {};
         console.log('i go the hell here Get All Users: ' + params)
-        await params.save({//Users.upsert(params, {
-            // UpsertOptions: {
-            //     returning: true
-            // }
-        }).then(rows => {
+        await params.save().then(rows => {
             if (rows !== null) {
                 console.log(JSON.stringify(rows));
                 result = rows;

@@ -2,6 +2,7 @@
 const Responses = require('../services/responses');
 const T = require('../data-access/BusinessObjectDAO')
 let Patients = require('../data-objects/Patient').Patient
+let ObjectProcessor = require('../data-objects/ObjectProcessor')
 class PatientSystem {
     constructor(req, res) {
         this.req = req;
@@ -26,6 +27,33 @@ class PatientSystem {
             }
         }
         this.res.send(JSON.stringify(response));
+    }
+    async UpdatePatientDetails(){
+        var response;
+        var obj;
+        try {
+            await T.Get(Patients, this.req.body.ID).then(data=>{
+                obj = data;
+            })
+            var processor = new ObjectProcessor()
+            obj = processor.MapModelFromObject(obj, this.req.body)
+            await T.Update(obj, this.req.body).then(data=>{
+                response = {
+                    record: data,
+                    count: data != null ? data.length : 0,
+                    Message: Responses.MessageResponse_SUCCESS.Message,
+                    Code: Responses.MessageResponse_SUCCESS.Code
+                }
+                this.res.send(JSON.stringify(response));
+            });
+        } catch (error) {
+            response = {
+                Error: error.message,
+                Message: Responses.MessageResponse_SYSTEM_MALFUNCTION.Message,
+                Code: Responses.MessageResponse_SYSTEM_MALFUNCTION.Code
+            }
+            this.res.send(JSON.stringify(response));
+        }
     }
     async RetrievePatientByUserID() {
         var response;
