@@ -9,12 +9,18 @@ class PatientMedicalsSystem {
     }
     async RetrieveAllPatientMedicals() {
         var response;
+        
         try {
-
-            var data = await T.GetAll(PreExistingCondition);
+            var params = {
+                page : 0,
+                pageSize : 5,
+                sort : 'ID',
+                dir : 'asc'
+            }
+            var data = await T.GetAll(PreExistingCondition, params);
             response = {
-                records: data,
-                count: data != null ? data.length : 0,
+                records: data.result,
+                count: data.count,
                 Message: Responses.MessageResponse_SUCCESS.Message,
                 Code: Responses.MessageResponse_SUCCESS.Code
             }
@@ -30,10 +36,20 @@ class PatientMedicalsSystem {
     async RetrievePatientMedicalsByPatientID() {
         var response;
         try {
-            await T.GetAllBy(PreExistingCondition, {PatientID : this.req.body.PatientID}).then(data=>{
+            
+            var params = {
+                page : 0,
+                pageSize : 5,
+                sort : 'ID',
+                dir : 'asc',
+            }
+            this.req.body.pagingParams = this.req.body.pagingParams === undefined ? params : this.req.body.pagingParams;
+            params.pagingParams = this.req.body.pagingParams;
+            params.query = {PatientID : this.req.body.PatientID};
+            await T.GetAllBy(PreExistingCondition, params).then(data=>{
                 response = {
-                    record: data,
-                    count: data != null ? data.length : 0,
+                    record: data.result,
+                    count: data.count,
                     Message: Responses.MessageResponse_SUCCESS.Message,
                     Code: Responses.MessageResponse_SUCCESS.Code
                 }

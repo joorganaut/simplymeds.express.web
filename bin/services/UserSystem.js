@@ -14,11 +14,16 @@ class UserSystem {
     async RetrieveAllUsers() {
         var response;
         try {
-
-            var data = await T.GetAll(Users);
+            var params = {
+                page : 0,
+                pageSize : 5,
+                sort : 'ID',
+                dir : 'asc',
+            }
+            var data = await T.GetAll(Users, params);
             response = {
-                records: data,
-                count: data != null ? data.length : 0,
+                records: data.result,
+                count: data.count,
                 Message: Responses.MessageResponse_SUCCESS.Message,
                 Code: Responses.MessageResponse_SUCCESS.Code
             }
@@ -34,9 +39,18 @@ class UserSystem {
     async RetrieveAllUsersByEmail() {
         var response;
         try {
-            var data = await T.GetAllBy(Users, {Email : this.req.body.Email});
+            var params = {
+                page : 0,
+                pageSize : 5,
+                sort : 'ID',
+                dir : 'asc',
+            }
+            this.req.body.pagingParams = this.req.body.pagingParams === undefined ? params : this.req.body.pagingParams;
+            params.pagingParams = this.req.body.pagingParams;
+            params.query = {Email : this.req.body.Email};
+            var data = await T.GetAllBy(Users, params);
             response = {
-                records: data,
+                records: data.result,
                 count: data != null ? data.length : 0,
                 Message: Responses.MessageResponse_SUCCESS.Message,
                 Code: Responses.MessageResponse_SUCCESS.Code
@@ -71,7 +85,16 @@ class UserSystem {
     async RegisterUser() {
         var response;
         try {
-            var existingUser = await T.GetAllBy(Users, {Email : this.req.body.Email});
+            var params = {
+                page : 0,
+                pageSize : 5,
+                sort : 'ID',
+                dir : 'asc',
+            }
+            this.req.body.pagingParams = this.req.body.pagingParams === undefined ? params : this.req.body.pagingParams;
+            params.pagingParams = this.req.body.pagingParams;
+            params.query = {Email : this.req.body.Email};
+            var existingUser = await T.GetAllBy(Users, params);
             if (existingUser.length > 0) {
                 response = {
                     Error: ` User with Email ${this.req.body.Email} already exists`,
@@ -89,10 +112,19 @@ class UserSystem {
                         PhoneNumber : this.req.body.MobilePhoneNumber
                     }
                     await T.Save(Patients, patient).then(async ()=>{
-                        await T.GetAllBy(Roles, {Name : 'Customer'}).then(customerRoles =>{
-                            if(customerRoles.length > 0)
+                        var params = {
+                            page : 0,
+                            pageSize : 5,
+                            sort : 'ID',
+                            dir : 'asc',
+                        }
+                        this.req.body.pagingParams = this.req.body.pagingParams === undefined ? params : this.req.body.pagingParams;
+                        params.pagingParams = this.req.body.pagingParams;
+                        params.query = {Name : 'Customer'};
+                        await T.GetAllBy(Roles, params).then(res =>{
+                            if(res.result.length > 0)
                             {
-                                customerRoles.forEach(async x=>{
+                                res.result.forEach(async x=>{
                                     var userRole = {
                                         UserID : data.ID,
                                         RoleID : x.ID,
@@ -125,8 +157,17 @@ class UserSystem {
     async Login() {
         var response;
         try {
-            var existingUser = await T.GetAllBy(Users, {Email : this.req.body.Username});
-            if (existingUser.length < 1) {
+            var params = {
+                page : 0,
+                pageSize : 5,
+                sort : 'ID',
+                dir : 'asc',
+            }
+            this.req.body.pagingParams = this.req.body.pagingParams === undefined ? params : this.req.body.pagingParams;
+            params.pagingParams = this.req.body.pagingParams;
+            params.query = {Email : this.req.body.Username};
+            var existingUser = await T.GetAllBy(Users, params);
+            if (existingUser.result.length < 1) {
                 response = {
                     Error: ` User with Username ${this.req.body.Username} does not exists`,
                     Message: Responses.MessageResponse_SYSTEM_MALFUNCTION_INVALID_FIELDS.Message,
@@ -134,7 +175,7 @@ class UserSystem {
                 }
             } else {
                 var params = this.req.body;
-                var user = existingUser[0];
+                var user = existingUser.result[0];
                 params.Password = saltedMd5(params.Password, 'Joorgi')
                 if (user.Password === params.Password) {
 
@@ -143,12 +184,21 @@ class UserSystem {
                         user.DateLastModified = new Date().toDateString()
 
                     await T.Update(user).then(async ()=>{
-                        await T.GetAllBy(UserRoles, {UserID : user.ID}).then(async data=>{
+                        var params = {
+                            page : 0,
+                            pageSize : 5,
+                            sort : 'ID',
+                            dir : 'asc',
+                        }
+                        this.req.body.pagingParams = this.req.body.pagingParams === undefined ? params : this.req.body.pagingParams;
+                        params.pagingParams = this.req.body.pagingParams;
+                        params.query = {UserID : user.ID};
+                        await T.GetAllBy(UserRoles, params).then(async data=>{
                             response = {
                                 record: {
                                     Name : user.FullName,
                                     ID: user.ID,
-                                    Roles : data,
+                                    Roles : data.result,
                                 },
                                 IsAuthenticated: true,
                                 Message: Responses.MessageResponse_SUCCESS.Message,

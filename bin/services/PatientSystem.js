@@ -11,8 +11,14 @@ class PatientSystem {
     async RetrieveAllPatients() {
         var response;
         try {
-
-            var data = await T.GetAll(Patients);
+            var params = {
+                page : 0,
+                pageSize : 5,
+                sort : 'ID',
+                dir : 'asc',
+            }
+            
+            var data = await T.GetAll(Patients, params);
             response = {
                 records: data,
                 count: data != null ? data.length : 0,
@@ -58,10 +64,19 @@ class PatientSystem {
     async RetrievePatientByUserID() {
         var response;
         try {
-            await T.GetAllBy(Patients, {UserID : this.req.body.UserID}).then(data=>{
+            var params = {
+                page : 0,
+                pageSize : 5,
+                sort : 'ID',
+                dir : 'asc',
+            }
+            this.req.body.pagingParams = this.req.body.pagingParams === undefined ? params : this.req.body.pagingParams;
+            params.pagingParams = this.req.body.pagingParams;
+            params.query = {UserID : this.req.body.UserID};
+            await T.GetAllBy(Patients, params).then(data=>{
                 response = {
-                    record: data,
-                    count: data != null ? data.length : 0,
+                    record: data.result,
+                    count: data.count,
                     Message: Responses.MessageResponse_SUCCESS.Message,
                     Code: Responses.MessageResponse_SUCCESS.Code
                 }
