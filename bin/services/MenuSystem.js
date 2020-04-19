@@ -19,20 +19,24 @@ class MenuSystem {
         };
         var response;
         try {
-            await T.GetAll(Roles).then(async data => {
+            await T.GetAllNoPaging(Roles).then(async data => {
                 result.RoleData = data;
-                await T.GetAll(RFunctions).then(async data => {
-                    result.RFunctionData = data;
-                    await T.GetAll(UFunctions).then(async data => {
-                        result.UFunctionData = data;
-                        response = {
-                            records: result,
-                            Message: Responses.MessageResponse_SUCCESS.Message,
-                            Code: Responses.MessageResponse_SUCCESS.Code
-                        }
-                        this.res.send(JSON.stringify(response));
+                data.map(async r => {
+                    await T.GetAllByNoPaging(RFunctions, {
+                        RoleID: r.ID
+                    }).then(async data => {
+                        r.RFunctionData = data;
                     })
                 })
+                await T.GetAllNoPaging(UFunctions).then(async data => {
+                    result.UFunctionData = data;                                
+                })
+                response = {
+                    records: result,
+                    Message: Responses.MessageResponse_SUCCESS.Message,
+                    Code: Responses.MessageResponse_SUCCESS.Code
+                }
+                this.res.send(JSON.stringify(response));
             });
 
         } catch (error) {
@@ -53,15 +57,15 @@ class MenuSystem {
         var response;
         try {
             //await T.GetAllBy(UserRoles, {RoleID : this.req.body.RoleID}).then
-            await T.Get(req.body.ID).then(async data => {
+            await T.Get(Roles, this.req.body.ID).then(async data => {
                 if (data != null) {
-                    await T.GetAllBy(UserRoles, {UserID : data.ID}).then(async data => {
+                    await T.GetAllByNoPaging(UserRoles, {UserID : data.ID}).then(async data => {
                         result.RoleData = data;
                         data.forEach(async x=>{
-                            await T.GetAllBy(RFunctions, {RoleID : x.RoleID}).then(async data => {
+                            await T.GetAllByNoPaging(RFunctions, {RoleID : x.RoleID}).then(async data => {
                                 result.RFunctionData = data;
                                 data.forEach(async x=>{
-                                    await T.GetAllby(UFunctions, {ID : x.FunctionID}).then(async data => {
+                                    await T.GetAllByNoPaging(UFunctions, {ID : x.FunctionID}).then(async data => {
                                         result.UFunctionData = data;
                                         response = {
                                             records: result,

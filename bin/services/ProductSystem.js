@@ -1,14 +1,15 @@
 //const UserDAO = require('../data-access/UserDAO');
 const Responses = require('../services/responses');
 const T = require('../data-access/BusinessObjectDAO')
-let Patients = require('../data-objects/Patient').Patient
+let Products = require('../data-objects/Product').Product
+let BusinessImages = require('../data-objects/BusinessImage').BusinessImage
 let ObjectProcessor = require('../data-objects/ObjectProcessor')
-class PatientSystem {
+class ProductSystem {
     constructor(req, res) {
         this.req = req;
         this.res = res;
     }
-    async RetrieveAllPatients() {
+    async RetrieveAllProducts() {
         var response;
         try {
             var params = {
@@ -18,7 +19,13 @@ class PatientSystem {
                 dir : 'asc',
             }
             
-            var data = await T.GetAll(Patients, params);
+            await T.GetAll(Products, params).then(data=>{
+                data.result.map(p=>{
+                    await T.FindOne(BusinessImages, {ImageEntityID : p.ID, ImageEntity : 'Product'}).then(res=>{
+                        p.Image = res;
+                    })
+                })
+            });
             response = {
                 records: data,
                 count: data != null ? data.length : 0,
@@ -34,23 +41,29 @@ class PatientSystem {
         }
         this.res.send(JSON.stringify(response));
     }
-    async UpdatePatientDetails(){
+    async UpdateProductInfo(){
         var response;
         var obj;
         try {
-            await T.Get(Patients, this.req.body.ID).then(data=>{
+            await T.Get(Products, this.req.body.ID).then(data=>{
                 obj = data;
             })
             var processor = new ObjectProcessor()
             obj = processor.MapModelFromObject(obj, this.req.body)
             await T.Update(obj).then(data=>{
-                response = {
-                    record: data,
-                    count: data != null ? data.length : 0,
-                    Message: Responses.MessageResponse_SUCCESS.Message,
-                    Code: Responses.MessageResponse_SUCCESS.Code
-                }
-                this.res.send(JSON.stringify(response));
+                await T.FindOne(BusinessImages, {ImageEntityID : obj.ID, ImageEntity : 'Product'}).then(res=>{
+                    res.ImageString = this.req.body.ImageString;
+                    await T.Update(res).then(r=>{
+                        data.Image = r
+                        response = {
+                            record: data,
+                            count: data != null ? data.length : 0,
+                            Message: Responses.MessageResponse_SUCCESS.Message,
+                            Code: Responses.MessageResponse_SUCCESS.Code
+                        }
+                        this.res.send(JSON.stringify(response));
+                    })
+                })                
             });
         } catch (error) {
             response = {
@@ -61,7 +74,7 @@ class PatientSystem {
             this.res.send(JSON.stringify(response));
         }
     }
-    async RetrievePatientByUserID() {
+    async RetrieveProducts() {
         var response;
         try {
             var params = {
@@ -73,7 +86,12 @@ class PatientSystem {
             this.req.body.pagingParams = this.req.body.pagingParams === undefined ? params : this.req.body.pagingParams;
             params.pagingParams = this.req.body.pagingParams;
             params.query = {UserID : this.req.body.UserID};
-            await T.GetAllBy(Patients, params).then(data=>{
+            await T.GetAllBy(Products, params).then(data=>{
+                data.result.map(p=>{
+                    await T.FindOne(BusinessImages, {ImageEntityID : p.ID, ImageEntity : 'Product'}).then(res=>{
+                        p.Image = res;
+                    })
+                })
                 response = {
                     record: data.result,
                     count: data.count,
@@ -91,10 +109,13 @@ class PatientSystem {
             this.res.send(JSON.stringify(response));
         }        
     }
-    async RetrievePatientByID() {
+    async RetrieveProductByID() {
         var response;
         try {
-            var data = await T.Get(Patients, this.req.body.ID);
+            var data = await T.Get(Products, this.req.body.ID);
+            await T.FindOne(BusinessImages, {ImageEntityID : p.ID, ImageEntity : 'Product'}).then(res=>{
+                data.Image = res;
+            })
             response = {
                 record: data,
                 Message: Responses.MessageResponse_SUCCESS.Message,
@@ -109,10 +130,19 @@ class PatientSystem {
         }
         this.res.send(JSON.stringify(response));
     }
-    async AddPatientInfo() {
+    async AddProductInfo() {
         var response;
         try {
-            
+            var data = await T.Save(Products, this.req.body).then(data=>{
+                await T.Save(BusinessImages, {ImageEntityID : data.ID, ImageString : this.req.body.ImageString, ImageEntity : 'Product'}).then(res=>{
+                    data.Image = res;
+                })
+            });
+            response = {
+                record: data,
+                Message: Responses.MessageResponse_SUCCESS.Message,
+                Code: Responses.MessageResponse_SUCCESS.Code
+            }
         } catch (error) {
             response = {
                 Error: error.message,
@@ -125,5 +155,5 @@ class PatientSystem {
 }
 
 module.exports = {
-    PatientSystem
+    ProductSystem
 }

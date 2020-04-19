@@ -1,10 +1,10 @@
-export default Gender=()=>{
-    const Male ={
+export default Gender=()=>[
+    {
         Name : 'Male',
         Value : 0
-    }
-    const Female ={
+    },
+    {
         Name : 'Female',
         Value : 1
     }
-}
+]

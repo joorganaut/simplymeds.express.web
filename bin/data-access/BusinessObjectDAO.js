@@ -50,6 +50,25 @@ GetAll = async (T, params) => {
     }
     return result;
 };
+GetAllNoPaging = async (T) => {
+    try {
+        var result = {};
+        console.log('i go the hell here Get All records')
+        await T.findAll().then(rows => {
+            if (rows !== null) {
+                result = rows;
+            } else {
+                throw Responses.MessageResponse_TRANSACTION_INVALID.Message + ': they are no records';
+            }
+        }).error(err => {
+            throw Responses.MessageResponse_SYSTEM_MALFUNCTION.Message + ' ' + err.Message;
+        })
+    } catch (error) {
+        throw Responses.MessageResponse_SYSTEM_MALFUNCTION.Message + ' ' + error.message;
+        console.log(error)
+    }
+    return result;
+};
 GetAll = async (T, params, count) => {
     try {
         var result = {};
@@ -87,6 +106,27 @@ GetAllBy = async (T, params) => {
             order: [
                 [params.pagingParams.sort, params.pagingParams.dir]
             ],
+        }).then(rows => {
+            if (rows !== null) {
+                result = rows;
+            } else {
+                throw Responses.MessageResponse_TRANSACTION_INVALID.Message + ': they are no records';
+            }
+        }).error(err => {
+            throw Responses.MessageResponse_SYSTEM_MALFUNCTION.Message + ' ' + err.Message;
+        })
+    } catch (error) {
+        throw Responses.MessageResponse_SYSTEM_MALFUNCTION.Message + ' ' + error.message;
+        console.log(error)
+    }
+    return result;
+};
+GetAllByNoPaging = async (T, params) => {
+    try {
+        var result = {};
+        console.log('i go the hell here Get All records: ' + params)
+        await T.findAll({
+            params
         }).then(rows => {
             if (rows !== null) {
                 result = rows;
@@ -189,9 +229,30 @@ Delete = async(params)=>{
     }
     return result;
 }
+FindOne = async (T, params) => {
+    let result = {};
+    try {
+        await T.findOne(params)
+            .then(usr => {
+                if (usr !== null) {
+                    result = usr;
+                } else {
+                    throw Responses.MessageResponse_TRANSACTION_INVALID.Message + ': Not a valid ID';
+                }
+            }).error(err => {
+                throw Responses.MessageResponse_SYSTEM_MALFUNCTION.Message + ' ' + err.Message;
+            })
+    } catch (error) {
+        throw Responses.MessageResponse_SYSTEM_MALFUNCTION.Message + ' ' + error.message;
+        console.log(error)
+    }
+    return result;
+}
 module.exports = {
     GetAll,
+    GetAllNoPaging,
     GetAllBy,
+    GetAllByNoPaging,
     Get,
     Save,
     Update,

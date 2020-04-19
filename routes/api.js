@@ -36,6 +36,10 @@ router.post('/RetrieveMenu', function (req, res, next) {
   let service = new MenuSystem(req, res);
   service.RetrieveMenu();
 })
+router.post('/RetrieveMenuByUser', function (req, res, next) {
+  let service = new MenuSystem(req, res);
+  service.RetrieveMenuByUser();
+})
 router.post('/RetrievePatientDetails', function (req, res, next) {
   let service = new PatientSystem(req, res);
   service.RetrievePatientByUserID();
