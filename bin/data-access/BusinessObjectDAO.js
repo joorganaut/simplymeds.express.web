@@ -126,7 +126,7 @@ GetAllByNoPaging = async (T, params) => {
         var result = {};
         console.log('i go the hell here Get All records: ' + params)
         await T.findAll({
-            params
+            where : params
         }).then(rows => {
             if (rows !== null) {
                 result = rows;
@@ -232,7 +232,7 @@ Delete = async(params)=>{
 FindOne = async (T, params) => {
     let result = {};
     try {
-        await T.findOne(params)
+        await T.findOne({where : params})
             .then(usr => {
                 if (usr !== null) {
                     result = usr;
