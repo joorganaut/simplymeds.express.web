@@ -3,6 +3,7 @@ const Responses = require('../services/responses');
 const T = require('../data-access/BusinessObjectDAO')
 let Patients = require('../data-objects/Patient').Patient
 let ObjectProcessor = require('../data-objects/ObjectProcessor')
+let BusinessImages = require('../data-objects/BusinessImage').BusinessImage
 class PatientSystem {
     constructor(req, res) {
         this.req = req;
@@ -43,14 +44,40 @@ class PatientSystem {
             })
             var processor = new ObjectProcessor()
             obj = processor.MapModelFromObject(obj, this.req.body)
-            await T.Update(obj).then(data=>{
-                response = {
-                    record: data,
-                    count: data != null ? data.length : 0,
-                    Message: Responses.MessageResponse_SUCCESS.Message,
-                    Code: Responses.MessageResponse_SUCCESS.Code
-                }
-                this.res.send(JSON.stringify(response));
+            await T.Update(obj).then(async data=>{
+                await T.FindOne(BusinessImages, {ImageEntityID : data.ID, ImageEntity : 'Patient'}).then(async img=>{
+                    if(img === null)
+                    {
+                        img = {
+                            ImageEntityID : data.ID,
+                            ImageEntity : 'Patient',
+                            ImageString : this.req.body.ImageString
+                        }
+                        await T.Save(BusinessImages, img).then(()=>{
+                            response = {
+                                record: data,
+                                image: img !== null? img.ImageString:'',
+                                count: data != null ? data.length : 0,
+                                Message: Responses.MessageResponse_SUCCESS.Message,
+                                Code: Responses.MessageResponse_SUCCESS.Code
+                            }
+                            this.res.send(JSON.stringify(response));
+                        })
+                    }
+                    else{
+                        img.ImageString =  this.req.body.ImageString;
+                        await T.Update(img).then(()=>{
+                            response = {
+                                record: data,
+                                image: img !== null? img.ImageString:'',
+                                count: data != null ? data.length : 0,
+                                Message: Responses.MessageResponse_SUCCESS.Message,
+                                Code: Responses.MessageResponse_SUCCESS.Code
+                            }
+                            this.res.send(JSON.stringify(response));
+                        })
+                    }                    
+                })                
             });
         } catch (error) {
             response = {
@@ -73,14 +100,19 @@ class PatientSystem {
             this.req.body.pagingParams = this.req.body.pagingParams === undefined ? params : this.req.body.pagingParams;
             params.pagingParams = this.req.body.pagingParams;
             params.query = {UserID : this.req.body.UserID};
-            await T.GetAllBy(Patients, params).then(data=>{
-                response = {
-                    record: data.result,
-                    count: data.count,
-                    Message: Responses.MessageResponse_SUCCESS.Message,
-                    Code: Responses.MessageResponse_SUCCESS.Code
-                }
-                this.res.send(JSON.stringify(response));
+            await T.GetAllBy(Patients, params).then(async data=>{
+                data = data.result[0]
+                await T.FindOne(BusinessImages, {ImageEntityID : data.ID, ImageEntity : 'Patient'}).then(img=>{
+                    data.ImageString = "hello world"//img !== null? img.ImageString:''
+                    response = {
+                        record: data,
+                        image: img !== null? img.ImageString:'',
+                        count: data.count,
+                        Message: Responses.MessageResponse_SUCCESS.Message,
+                        Code: Responses.MessageResponse_SUCCESS.Code
+                    }
+                    this.res.send(JSON.stringify(response));
+                })                
             });
         } catch (error) {
             response = {
@@ -94,12 +126,18 @@ class PatientSystem {
     async RetrievePatientByID() {
         var response;
         try {
-            var data = await T.Get(Patients, this.req.body.ID);
-            response = {
-                record: data,
-                Message: Responses.MessageResponse_SUCCESS.Message,
-                Code: Responses.MessageResponse_SUCCESS.Code
-            }
+            await T.Get(Patients, this.req.body.ID).then(async data=>{
+                await T.FindOne(BusinessImages, {ImageEntityID : data.ID, ImageEntity : 'Patient'}).then(img=>{
+                    data.result.ImageString = img.ImageString
+                    response = {
+                        record: data.result,
+                        count: data.count,
+                        Message: Responses.MessageResponse_SUCCESS.Message,
+                        Code: Responses.MessageResponse_SUCCESS.Code
+                    }
+                    this.res.send(JSON.stringify(response));
+                }) 
+            });
         } catch (error) {
             response = {
                 Error: error.message,

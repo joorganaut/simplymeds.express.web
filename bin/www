@@ -1,11 +1,15 @@
 #!/usr/bin/env node
-
+const express = require('express');
+const bodyParser = require('body-parser');
 require('dotenv').config({path: __dirname + '/.env'})
 /**
  * Module dependencies.
  */
 
 var app = require('../app');
+app.use(bodyParser.json({ limit: '4mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '4mb' }));
+
 var debug = require('debug')('simplymeds.express.web:server');
 var http = require('http');
 

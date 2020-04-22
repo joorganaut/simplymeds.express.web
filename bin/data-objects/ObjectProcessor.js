@@ -1,11 +1,11 @@
 class ObjectProcessor {
-    MapModelFromObject (model, obj) {
+    MapModelFromObject(model, obj) {
         for (var prop in obj) {
-            //if (model.hasOwnProperty(prop)) {
+            if (prop in model) {
                 if (model[prop] !== obj[prop] && obj[prop] !== null) {
                     model[prop] = obj[prop];
                 }
-            //}
+            }
         }
         return model;
     }

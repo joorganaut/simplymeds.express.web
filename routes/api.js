@@ -4,6 +4,7 @@ var router = express.Router();
 const UserSystem = require('../bin/services/UserSystem').UserSystem;
 const MenuSystem = require('../bin/services/MenuSystem').MenuSystem;
 const PatientSystem = require('../bin/services/PatientSystem').PatientSystem;
+const ProductSystem = require('../bin/services/ProductSystem').ProductSystem;
 const PatientMedicalsSystem = require('../bin/services/PatientMedicalsSystem').PatientMedicalsSystem;
 const SchemaUpdate = require('../bin/services/SchemaUpdate')
 SchemaUpdate.SchemaUpdate();
@@ -55,6 +56,10 @@ router.post('/AddPatientMedicals', function (req, res, next) {
 router.post('/UpdatePatientDetails', function (req, res, next) {
   let service = new PatientSystem(req, res);
   service.UpdatePatientDetails();
+})
+router.post('/AddProductDetails', function (req, res, next) {
+  let service = new ProductSystem(req, res);
+  service.AddProductInfo();
 })
 
 module.exports = router;

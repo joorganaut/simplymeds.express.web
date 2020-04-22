@@ -16,7 +16,7 @@ const DISABLE_SEQUELIZE_DEFAULTS = {
 const sequelize  = BusinessObject.sequelize;
 const BusinessImage = sequelize.define('businessimages', {
     ID: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
-    ImageString: { type:  DataTypes.STRING},
+    ImageString: { type:  DataTypes.TEXT},
     ImageEntityID: { type:  DataTypes.BIGINT},
     ImageEntity: { type:  DataTypes.STRING},
     IsEnabled: { type:  DataTypes.BOOLEAN},

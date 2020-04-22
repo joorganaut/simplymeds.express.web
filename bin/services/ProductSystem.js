@@ -19,8 +19,8 @@ class ProductSystem {
                 dir : 'asc',
             }
             
-            await T.GetAll(Products, params).then(data=>{
-                data.result.map(p=>{
+            await T.GetAll(Products, params).then(async data=>{
+                data.result.map(async p=>{
                     await T.FindOne(BusinessImages, {ImageEntityID : p.ID, ImageEntity : 'Product'}).then(res=>{
                         p.Image = res;
                     })
@@ -50,8 +50,8 @@ class ProductSystem {
             })
             var processor = new ObjectProcessor()
             obj = processor.MapModelFromObject(obj, this.req.body)
-            await T.Update(obj).then(data=>{
-                await T.FindOne(BusinessImages, {ImageEntityID : obj.ID, ImageEntity : 'Product'}).then(res=>{
+            await T.Update(obj).then(async data=>{
+                await T.FindOne(BusinessImages, {ImageEntityID : obj.ID, ImageEntity : 'Product'}).then(async res=>{
                     res.ImageString = this.req.body.ImageString;
                     await T.Update(res).then(r=>{
                         data.Image = r
@@ -86,8 +86,8 @@ class ProductSystem {
             this.req.body.pagingParams = this.req.body.pagingParams === undefined ? params : this.req.body.pagingParams;
             params.pagingParams = this.req.body.pagingParams;
             params.query = {UserID : this.req.body.UserID};
-            await T.GetAllBy(Products, params).then(data=>{
-                data.result.map(p=>{
+            await T.GetAllBy(Products, params).then(async data=>{
+                data.result.map(async p=>{
                     await T.FindOne(BusinessImages, {ImageEntityID : p.ID, ImageEntity : 'Product'}).then(res=>{
                         p.Image = res;
                     })
@@ -112,15 +112,16 @@ class ProductSystem {
     async RetrieveProductByID() {
         var response;
         try {
-            var data = await T.Get(Products, this.req.body.ID);
-            await T.FindOne(BusinessImages, {ImageEntityID : p.ID, ImageEntity : 'Product'}).then(res=>{
-                data.Image = res;
+            await T.Get(Products, this.req.body.ID).then(async data=>{
+                await T.FindOne(BusinessImages, {ImageEntityID : p.ID, ImageEntity : 'Product'}).then(res=>{
+                    data.Image = res;
+                    response = {
+                        record: data,
+                        Message: Responses.MessageResponse_SUCCESS.Message,
+                        Code: Responses.MessageResponse_SUCCESS.Code
+                    }
+                })
             })
-            response = {
-                record: data,
-                Message: Responses.MessageResponse_SUCCESS.Message,
-                Code: Responses.MessageResponse_SUCCESS.Code
-            }
         } catch (error) {
             response = {
                 Error: error.message,
@@ -133,16 +134,20 @@ class ProductSystem {
     async AddProductInfo() {
         var response;
         try {
-            var data = await T.Save(Products, this.req.body).then(data=>{
-                await T.Save(BusinessImages, {ImageEntityID : data.ID, ImageString : this.req.body.ImageString, ImageEntity : 'Product'}).then(res=>{
-                    data.Image = res;
+            var ImageString = this.req.body.ImageString;
+            this.req.body.ImageString = null;
+            await T.Save(Products, this.req.body).then(async data=>{
+                await T.Save(BusinessImages, {ImageEntityID : data.ID, ImageString : ImageString, ImageEntity : 'Product'}).then(res=>{
+                    //data.Image = res.ImageString;
+                    response = {
+                        record: data,
+                        Message: Responses.MessageResponse_SUCCESS.Message,
+                        Code: Responses.MessageResponse_SUCCESS.Code
+                    }
+                    this.res.send(JSON.stringify(response));
                 })
             });
-            response = {
-                record: data,
-                Message: Responses.MessageResponse_SUCCESS.Message,
-                Code: Responses.MessageResponse_SUCCESS.Code
-            }
+            
         } catch (error) {
             response = {
                 Error: error.message,

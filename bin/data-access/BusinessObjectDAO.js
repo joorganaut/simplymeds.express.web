@@ -243,7 +243,7 @@ FindOne = async (T, params) => {
                 throw Responses.MessageResponse_SYSTEM_MALFUNCTION.Message + ' ' + err.Message;
             })
     } catch (error) {
-        throw Responses.MessageResponse_SYSTEM_MALFUNCTION.Message + ' ' + error.message;
+        return null
         console.log(error)
     }
     return result;
@@ -256,5 +256,6 @@ module.exports = {
     Get,
     Save,
     Update,
-    Delete
+    Delete,
+    FindOne
 }
