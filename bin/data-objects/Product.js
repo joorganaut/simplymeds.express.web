@@ -36,6 +36,7 @@ const Product = sequelize.define('products', {
     InstitutionCode: { type:  DataTypes.STRING},
     InstitutionID: { type:  DataTypes.INTEGER},
     Name: { type:  DataTypes.STRING},
+    BRAND: { type:  DataTypes.STRING},
 }, 
 {tableName : 'products'},DISABLE_SEQUELIZE_DEFAULTS);
 module.exports = {Product}
